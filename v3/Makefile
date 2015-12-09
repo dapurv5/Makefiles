@@ -7,17 +7,19 @@ CXXFLAGS = -O3 \
            -Wno-sign-compare \
            -fno-omit-frame-pointer
 
-
-#place all your header files only in a single folder, this still doesn't work with multiple folders  	  	
-ANAHATA_HEADERS = $(shell find $(PROJECT)/src/main/native -type f -name "*.hpp"  -printf '%h\n' | sort -u)
-ANAHATA_SRC     = $(shell find $(PROJECT)/src/main/native -type f -name "*.cpp")
-ANAHATA_OBJ = $(ANAHATA_SRC:.cpp=.o)
-
-LD_FLAGS = -lrt
-INC_FLAGS = -I$(ANAHATA_HEADERS) 
-
 BIN_DIR = $(PROJECT)/bin
 ANAHATA = $(BIN_DIR)/ANAHATA
+
+#place all your header files only in a single folder, this still doesn't work with multiple folders  	  	
+HEADER_FILES = $(shell find $(PROJECT)/src/main/native -type f -name "*.hpp"  -printf '%h\n' | sort -u)
+CPP_FILES = $(shell find $(PROJECT)/src/main/native -type f -name "*.cpp")
+OBJ_FILES = $(addprefix $(BIN_DIR)/,$(notdir $(CPP_FILES:.cpp=.o)))
+
+BUILD_SRC = $(CPP_FILES:.cpp=.o)
+
+LD_FLAGS = -lrt
+
+INC_FLAGS = $(addprefix -I,$(HEADER_FILES))
 
 all: path \
 	 ANAHATA
@@ -27,15 +29,15 @@ path: $(BIN_DIR)
 $(BIN_DIR):
 	mkdir -p $@
 
-$(ANAHATA): $(ANAHATA_OBJ)
-	$(CXX) $(ANAHATA_OBJ) $(CXXFLAGS) $(LD_FLAGS) -o $@
+$(ANAHATA): $(BUILD_SRC)
+	$(CXX) $(OBJ_FILES) $(CXXFLAGS) $(LD_FLAGS) -o $@
 
-$(ANAHATA_OBJ): %.o: %.cpp $(ANAHATA_HEADERS)
-	$(CXX) $(CXXFLAGS) $(INC_FLAGS) -c $< -o $@
+$(BUILD_SRC): %.o: %.cpp $(HEADER_FILES)
+	$(CXX) $(CXXFLAGS) $(INC_FLAGS) -c $< -o $(BIN_DIR)/$(shell basename $@)
 
 ANAHATA: path $(ANAHATA)
 	
 clean:
-	rm -rf $(BIN_DIR) $(ANAHATA_OBJ)
+	rm -rf $(BIN_DIR) $(OBJ_FILES)
 
 .PHONY: all path ANAHATA clean
