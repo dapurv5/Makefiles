@@ -3,7 +3,7 @@
 
 One [Makefile](./v3/Makefile) to rule them all.
 
-### Project Layout for your project
+### Directory Layout for your project
 
 ```
 anahata
