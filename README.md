@@ -1,6 +1,9 @@
 # Makefiles
 ==========================
 
+Writing makefiles was a difficult and painful process for me. Makefiles is a project which brings you one grand unified Makefile that can be used across all your projects without having to change the Makefile everytime you add a source file or a header file or a new folder.
+
+
 One [Makefile](./v3/Makefile) to rule them all.
 
 ### Directory Layout for your project
